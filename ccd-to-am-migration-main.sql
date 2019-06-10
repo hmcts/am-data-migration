@@ -19,19 +19,19 @@ ALTER TABLE access_management DROP CONSTRAINT relationship_fkey;
 
 \COPY stage FROM 'am-migration.csv' DELIMITER ',' CSV HEADER;
 
-SELECT COUNT(*) AS "columns to migrate" FROM stage;
+SELECT COUNT(*) AS "rows to migrate" FROM stage;
 
 SELECT COUNT(*) AS "pre-migration access_management count" FROM access_management;
 
 WITH found_errors AS (
     DELETE FROM stage
     WHERE case_data_id IS NULL
-        OR case_data_id ~ '[^0-9]'
         OR case_type_id IS NULL
-        OR case_type_id NOT IN (SELECT resource_name FROM resources)
         OR user_id IS NULL
         OR case_role IS NULL
+        OR case_type_id NOT IN (SELECT resource_name FROM resources)
         OR case_role NOT IN (SELECT role_name FROM roles)
+    RETURNING *
 )
 INSERT INTO errors SELECT * FROM found_errors;
 

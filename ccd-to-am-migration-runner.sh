@@ -4,15 +4,28 @@ echo
 set -e
 set -u
 
-INIT_SQL="./ccd-to-am-migration-init.sql"
-MAIN_SQL="./ccd-to-am-migration-main.sql"
-
 echo "* CCD to AM migration..."
 echo
-read -p "* AM DB hostname: " HOST
-read -p "* AM DB port: " PORT
-read -p "* AM DB name: " DB
-read -p "* AM DB username: " USER
+
+if [ "$#" -ne 5 ]; then
+    echo "* Illegal number of arguments."
+    echo "* Usage: $0 [hostname] [port] [db_name] [db_username] [input.sql]"
+    echo
+    echo "* Exiting"
+    echo
+    exit 1
+fi
+
+HOST="$1"
+PORT="$2"
+DB="$3"
+USER="$4"
+SQL="$5"
+
+echo "* AM DB hostname: $HOST"
+echo "* AM DB port: $PORT"
+echo "* AM DB name: $DB"
+echo "* AM DB username: $USER"
 echo
 
 psql \
@@ -21,19 +34,7 @@ psql \
     -h $HOST \
     -p $PORT \
     -U $USER \
-    -f $INIT_SQL \
-    --set AUTOCOMMIT=off \
-    --set ON_ERROR_ROLLBACK=on \
-    --set ON_ERROR_STOP=off \
-    $DB
-
-psql \
-    -X \
-    -q \
-    -h $HOST \
-    -p $PORT \
-    -U $USER \
-    -f $MAIN_SQL \
+    -f $SQL \
     --set AUTOCOMMIT=off \
     --set ON_ERROR_ROLLBACK=on \
     --set ON_ERROR_STOP=off \

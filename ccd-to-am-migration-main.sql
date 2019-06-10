@@ -7,6 +7,13 @@ CREATE TEMP TABLE stage
     user_id VARCHAR, case_role VARCHAR
 );
 
+CREATE TEMP TABLE errors
+(
+    case_data_id VARCHAR, case_type_id VARCHAR,
+    user_id VARCHAR, case_role VARCHAR
+);
+
+ALTER TABLE access_management DROP CONSTRAINT access_management_unique;
 ALTER TABLE access_management DROP CONSTRAINT access_management_resources_fkey;
 ALTER TABLE access_management DROP CONSTRAINT relationship_fkey;
 
@@ -15,6 +22,18 @@ ALTER TABLE access_management DROP CONSTRAINT relationship_fkey;
 SELECT COUNT(*) AS "columns to migrate" FROM stage;
 
 SELECT COUNT(*) AS "pre-migration access_management count" FROM access_management;
+
+WITH found_errors AS (
+    DELETE FROM stage
+    WHERE case_data_id IS NULL
+        OR case_data_id ~ '[^0-9]'
+        OR case_type_id IS NULL
+        OR case_type_id NOT IN (SELECT resource_name FROM resources)
+        OR user_id IS NULL
+        OR case_role IS NULL
+        OR case_role NOT IN (SELECT role_name FROM roles)
+)
+INSERT INTO errors SELECT * FROM found_errors;
 
 INSERT INTO access_management (resource_id, accessor_type, accessor_id,
         "attribute", permissions, service_name, resource_name,
@@ -29,13 +48,15 @@ INSERT INTO access_management (resource_id, accessor_type, accessor_id,
     WHERE ra.resource_name = s.case_type_id
     AND dp.resource_name = s.case_type_id
     AND re.resource_name = s.case_type_id
-    AND s.case_role IN (SELECT role_name FROM roles)
 EXCEPT
     SELECT resource_id, accessor_type, accessor_id, "attribute",
         permissions, service_name, resource_name, resource_type,
         relationship
     FROM access_management;
 
+ALTER TABLE access_management ADD CONSTRAINT access_management_unique
+    UNIQUE (resource_id, accessor_id, accessor_type, "attribute", resource_type,
+        service_name, resource_name, relationship);
 ALTER TABLE access_management ADD CONSTRAINT access_management_resources_fkey
     FOREIGN KEY (service_name, resource_type, resource_name)
     REFERENCES resources(service_name, resource_type, resource_name);
@@ -47,21 +68,8 @@ COMMIT;
 
 SELECT COUNT(*) AS "post-migration access_management count" FROM access_management;
 
-WITH errors AS
-(
-    SELECT * FROM stage
-    EXCEPT
-        SELECT resource_id AS case_data_id, resource_name AS case_type_id,
-            accessor_id AS user_id, relationship AS case_role
-        FROM access_management
-)
 SELECT COUNT(*) AS "migration errors" FROM errors;
 
-SELECT * FROM stage
-EXCEPT
-    SELECT resource_id AS case_data_id, resource_name AS case_type_id,
-        accessor_id AS user_id, relationship AS case_role
-    FROM access_management
-    LIMIT 100;
+SELECT * FROM errors;
 
 COMMIT;

@@ -9,13 +9,19 @@ properties([
     ])
 ])
 
-try {
-    node {
-        stage('Checkout') {
-            checkout scm
-            ls -a
+pipeline {
+    agent any
+    stages {
+        stage('Checkout migration scripts') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('Check if migration scripts exist here') {
+            steps {
+                ls -a
+            }
         }
     }
-} catch (e) {
-    throw e
 }

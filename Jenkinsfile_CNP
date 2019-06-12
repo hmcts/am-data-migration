@@ -4,7 +4,9 @@
 
 try {
     node {
+        onPR {
         
+        }
     }
 } catch (e) {
     throw e

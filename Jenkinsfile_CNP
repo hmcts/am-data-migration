@@ -1,0 +1,11 @@
+#!groovy
+
+@Library('Infrastructure')
+
+try {
+    node {
+        
+    }
+} catch (e) {
+    throw e
+}

@@ -1,1 +1,1 @@
-Scripts for running CCD to AM data migration.
+Scripts for running data migration to AM.

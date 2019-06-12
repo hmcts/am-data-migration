@@ -1,11 +1,18 @@
 #!groovy
 
-@Library('Infrastructure')
+@Library('Infrastructure') _
+
+properties([
+    parameters([
+        choice(name: 'ENVIRONMENT', choices: 'saat\nsprod\naat\nprod', description: 'Environment where migration should be run'),
+        choice(name: 'SUBSCRIPTION', choices: 'sandbox\nnonprod\nprod', description: 'Azure subscriptions available to build in')
+    ])
+])
 
 try {
     node {
         onPR {
-        
+
         }
     }
 } catch (e) {

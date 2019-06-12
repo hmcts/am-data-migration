@@ -1,4 +1,4 @@
-#!groovy
+!groovy
 
 @Library('Infrastructure') _
 
@@ -9,12 +9,18 @@ properties([
     ])
 ])
 
-try {
-    node {
-        onPR {
+pipeline {
+    stages {
+        stage('Checkout migration scripts') {
+            steps {
+                checkout scm
+            }
+        }
 
+        stage('Check if migration scripts exist here') {
+            steps {
+                ls -a
+            }
         }
     }
-} catch (e) {
-    throw e
 }

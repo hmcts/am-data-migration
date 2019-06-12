@@ -9,18 +9,11 @@ properties([
     ])
 ])
 
-pipeline {
-    stages {
-        stage('Checkout migration scripts') {
-            steps {
-                checkout scm
-            }
-        }
-
-        stage('Check if migration scripts exist here') {
-            steps {
-                ls -a
-            }
-        }
+try {
+    node {
+        checkout scm
+        ls -a
     }
+} catch (e) {
+    throw e
 }

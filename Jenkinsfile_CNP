@@ -20,7 +20,7 @@ pipeline {
 
         stage('Check if migration scripts exist here') {
             steps {
-                ls -a
+                sh 'ls -a'
             }
         }
     }

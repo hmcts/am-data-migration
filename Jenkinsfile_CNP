@@ -12,11 +12,15 @@ properties([
 pipeline {
     agent any
     stages {
-        
-
-        stage('Check if migration scripts exist here') {
+        stage('Checkout') {
             steps {
-                sh 'ls -a'
+                checkout scm
+            }
+        }
+
+        stage('Run migration script') {
+            steps {
+                sh './ccd-to-am-migration-runner.sh localhost 5432 am amuser ccd-to-am-migration-main.sql'
             }
         }
     }

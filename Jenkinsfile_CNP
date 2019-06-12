@@ -11,8 +11,10 @@ properties([
 
 try {
     node {
-        checkout scm
-        ls -a
+        stage('Checkout') {
+            checkout scm
+            ls -a
+        }
     }
 } catch (e) {
     throw e

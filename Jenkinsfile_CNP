@@ -21,6 +21,7 @@ pipeline {
         stage('Set up postgres docker container') {
             steps {
                 sh '''
+                    rm -rf migration
                     mkdir migration
                     cd migration
                     docker pull postgres

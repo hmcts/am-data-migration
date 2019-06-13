@@ -32,7 +32,7 @@ pipeline {
         stage('Run migration script') {
             steps {
                 sh '''
-                    docker exec -it pg-docker bash
+                    winpty docker exec -it pg-docker bash
                     cd /migration
                     chmod 777 ccd-to-am-migration-runner.sh
                     ./ccd-to-am-migration-runner.sh localhost 5432 am amuser ccd-to-am-migration-main.sql

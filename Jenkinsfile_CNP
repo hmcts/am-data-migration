@@ -9,31 +9,24 @@ properties([
     ])
 ])
 
-def hostname = "localhost"
-def port = "5432"
-def db_name = "am"
-def db_user = "amuser"
-def migration_script = "ccd-to-am-migration-main.sql"
+node {
+    stage('Checkout') {
+        deleteDir()
+        checkout scm
+    }
+    stage('Run migration') {
+        def DB_HOST = 'localhost'
+        def DB_PORT = '5432'
+        def DB_NAME = 'am'
+        def DB_USER = 'amuser'
+        def DB_PASS = ''
 
-pipeline {
-    agent any
-    stages {
-        stage('Set up postgres docker container') {
-            steps {
+        withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: 'am-credentials', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD']]) {
+            docker.image('jbergknoff/postgresql-client').inside("--entrypoint='' -e PGPASSWORD=${DB_PASS} -v ${WORKSPACE}:/migration") {
                 sh '''
-                    rm -rf migration
-                    mkdir migration
-                    cp ./ccd-to-am-migration-init.sql ./ccd-to-am-migration-main.sql ./ccd-to-am-migration-runner.sh ./migration
-                    docker pull postgres
-                    docker run --rm --name pg-docker -d postgres
-                    docker cp ./migration pg-docker:/
-                '''
-            }
-        }
-        stage('Run migration script') {
-            steps {
-                sh '''
-                    docker exec pg-docker bash -c "cd migration; ls -a; chmod 777 ccd-to-am-migration-runner.sh; ./ccd-to-am-migration-runner.sh localhost 5432 am amuser ccd-to-am-migration-main.sql"
+                    chmod 777 /migration/ccd-to-am-migration-runner.sh
+                    /migration/ccd-to-am-migration-runner.sh ${DB_HOST} ${DB_PORT} ${DB_NAME} ${DB_USER}
+                    rm -rf /migration
                 '''
             }
         }

@@ -33,7 +33,7 @@ pipeline {
         stage('Run migration script') {
             steps {
                 sh '''
-                    docker exec pg-docker bash -c "ls -a; cd migration; chmod 777 ccd-to-am-migration-runner.sh; ./ccd-to-am-migration-runner.sh localhost 5432 am amuser ccd-to-am-migration-main.sql"
+                    docker exec pg-docker bash -c "cd migration; ls -a; chmod 777 ccd-to-am-migration-runner.sh; ./ccd-to-am-migration-runner.sh localhost 5432 am amuser ccd-to-am-migration-main.sql"
                 '''
             }
         }

@@ -21,7 +21,7 @@ node {
         def DB_USER = 'amuser'
         def DB_PASS = ''
 
-        withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: 'am-credentials', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD']]) {
+        //withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: 'am-credentials', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD']]) {
             docker.image('jbergknoff/postgresql-client').inside("--entrypoint='' -e PGPASSWORD=${DB_PASS} -v ${WORKSPACE}:/migration") {
                 sh '''
                     chmod 777 /migration/ccd-to-am-migration-runner.sh
@@ -29,6 +29,6 @@ node {
                     rm -rf /migration
                 '''
             }
-        }
+        }//
     }
 }

@@ -25,7 +25,7 @@ node {
             docker.image('jbergknoff/postgresql-client').inside("--entrypoint='' -e PGPASSWORD=${DB_PASS} -v ${WORKSPACE}:/migration") {
                 sh '''
                     chmod 777 /migration/ccd-to-am-migration-runner.sh
-                    /migration/ccd-to-am-migration-runner.sh ${DB_HOST} ${DB_PORT} ${DB_NAME} ${DB_USER}
+                    /migration/ccd-to-am-migration-runner.sh ${DB_HOST} ${DB_PORT} ${DB_NAME} ${DB_USER} ccd-to-am-migration-main.sql
                     rm -rf /migration
                 '''
             }

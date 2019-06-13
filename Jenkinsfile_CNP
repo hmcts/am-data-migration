@@ -26,7 +26,7 @@ pipeline {
                     cp ./ccd-to-am-migration-init.sql ./ccd-to-am-migration-main.sql ./ccd-to-am-migration-runner.sh ./migration
                     docker pull postgres
                     docker run --rm --name pg-docker -d postgres
-                    docker cp ../migration pg-docker:/
+                    docker cp ./migration pg-docker:/
                 '''
             }
         }

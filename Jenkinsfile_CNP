@@ -15,7 +15,7 @@ node {
         checkout scm
     }
     stage('Run migration') {
-        def DB_HOST = 'localhost'
+        def DB_HOST = "localhost"
         def DB_PORT = '5432'
         def DB_NAME = 'am'
         def DB_USER = 'amuser'

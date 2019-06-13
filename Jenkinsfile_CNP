@@ -23,7 +23,7 @@ pipeline {
                 sh '''
                     rm -rf migration
                     mkdir migration
-                    cd migration
+                    cp ./* ./migration
                     docker pull postgres
                     docker run --rm --name pg-docker -d postgres
                     docker cp ../migration pg-docker:/

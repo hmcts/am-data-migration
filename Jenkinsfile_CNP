@@ -15,7 +15,7 @@ node {
         checkout scm
     }
     stage('Run migration') {
-        def DB_HOST = /localhost/
+        def DB_HOST = 'localhost'
         def DB_PORT = '5432'
         def DB_NAME = 'am'
         def DB_USER = 'amuser'
@@ -23,11 +23,9 @@ node {
 
         //withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: 'am-credentials', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD']]) {
             docker.image('jbergknoff/postgresql-client').inside("--entrypoint='' -e PGPASSWORD=${DB_PASS} -v ${WORKSPACE}:/migration") {
-                sh '''
-                    chmod 777 /migration/ccd-to-am-migration-runner.sh
-                    /migration/ccd-to-am-migration-runner.sh ${DB_HOST} ${DB_PORT} ${DB_NAME} ${DB_USER} ccd-to-am-migration-main.sql
-                    rm -rf /migration
-                '''
+                sh "chmod 777 /migration/ccd-to-am-migration-runner.sh"
+                sh "/migration/ccd-to-am-migration-runner.sh ${DB_HOST} ${DB_PORT} ${DB_NAME} ${DB_USER} ccd-to-am-migration-main.sql"
+                sh "rm -rf /migration"
             }
         //}
     }

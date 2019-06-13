@@ -29,6 +29,6 @@ node {
                     rm -rf /migration
                 '''
             }
-        }//
+        //}
     }
 }

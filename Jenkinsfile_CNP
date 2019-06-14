@@ -57,11 +57,15 @@ node {
     }
 
     stage('Run migration') {
-        def config = new AppPipelineConfig()
-        config.vaultSecrets = secrets
+        //def config = new AppPipelineConfig()
+        //config.vaultSecrets = secrets
 
         //withSubscription(params.SUBSCRIPTION) {
-            withTeamSecrets(config, params.ENVIRONMENT) {
+        //    withTeamSecrets(config, params.ENVIRONMENT) {
+
+                setVaultName('am-lib-test')
+                loadVaultSecrets(secrets)
+
                 docker.image('jbergknoff/postgresql-client').inside("--entrypoint='' -e PGPASSWORD=${DATABASE_PASS} -v ${WORKSPACE}:/migration") {
                     sh """
                         chmod 777 /migration/ccd-to-am-migration-runner.sh
@@ -69,7 +73,7 @@ node {
                         rm -rf /migration
                     """
                 }
-            }
+        //    }
         //}
     }
 }

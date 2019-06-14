@@ -7,8 +7,8 @@ import uk.gov.hmcts.contino.AppPipelineConfig
 properties([
     pipelineTriggers([cron('H 05 * * *')]),
     parameters([
-        choice(name: 'ENVIRONMENT', choices: 'saat\nsprod\naat\nprod', description: 'Environment where migration should be run'),
-        choice(name: 'SUBSCRIPTION', choices: 'sandbox\nnonprod\nprod', description: 'Azure subscriptions available to build in')
+        choice(name: 'ENVIRONMENT', choices: 'aat\saat\nsprod\naat\nprod', description: 'Environment where migration should be run'),
+        choice(name: 'SUBSCRIPTION', choices: 'dev\sandbox\nnonprod\nprod', description: 'Azure subscriptions available to build in')
     ])
 ])
 
@@ -56,7 +56,7 @@ node {
         def config = new AppPipelineConfig()
         config.vaultSecrets = secrets
 
-        withSubscription(params.SUBSCRIPTION) { 
+        withSubscription(params.SUBSCRIPTION) {
             withTeamSecrets(config, params.ENVIRONMENT) {
                 docker.image('jbergknoff/postgresql-client').inside("--entrypoint='' -e PGPASSWORD=${DATABASE_PASS} -v ${WORKSPACE}:/migration") {
                     sh """

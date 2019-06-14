@@ -11,7 +11,7 @@ properties([
     ])
 ])
 
-def secretId = "am-aat"
+def secretId = "am-lib-test-aat"
 def product = "am"
 def component = "migration"
 

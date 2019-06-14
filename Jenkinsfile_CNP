@@ -56,7 +56,7 @@ node {
         def config = new AppPipelineConfig()
         config.vaultSecrets = secrets
 
-        withSubscription(params.SUBSCRIPTION) {
+        withSubscription(params.SUBSCRIPTION) { 
             withTeamSecrets(config, params.ENVIRONMENT) {
                 docker.image('jbergknoff/postgresql-client').inside("--entrypoint='' -e PGPASSWORD=${DATABASE_PASS} -v ${WORKSPACE}:/migration") {
                     sh """

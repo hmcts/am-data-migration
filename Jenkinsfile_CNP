@@ -7,16 +7,12 @@ import uk.gov.hmcts.contino.AppPipelineConfig
 properties([
     pipelineTriggers([cron('H 05 * * *')]),
     parameters([
-        string(name: 'ENVIRONMENT', defaultValue: 'aat', description: 'Environment to test')
-        //choice(name: 'ENVIRONMENT', choices: 'saat\nsprod\naat\nprod', description: 'Environment where migration should be run'),
-        //choice(name: 'SUBSCRIPTION', choices: 'sandbox\nnonprod\nprod', description: 'Azure subscriptions available to build in')
+        choice(name: 'ENVIRONMENT', choices: 'saat\nsprod\naat\nprod', description: 'Environment where migration should be run'),
+        choice(name: 'SUBSCRIPTION', choices: 'sandbox\nnonprod\nprod', description: 'Azure subscriptions available to build in')
     ])
 ])
 
 def secretId = "am-lib-test-aat"
-def product = "am"
-def component = "migration"
-
 def secrets = [
     (secretId): [
         secret('am-lib-test-POSTGRES-HOST', 'DATABASE_HOST'),
@@ -42,7 +38,7 @@ node {
         checkout scm
     }
 
-    if (params.ENVIRONMENT == 'aat') {
+    if (params.ENVIRONMENT == 'saat') {
         env.DB_HOST = 'localhost'
         env.DB_PORT = '5432'
         env.DB_NAME = 'am'
@@ -57,15 +53,11 @@ node {
     }
 
     stage('Run migration') {
-        //def config = new AppPipelineConfig()
-        //config.vaultSecrets = secrets
+        def config = new AppPipelineConfig()
+        config.vaultSecrets = secrets
 
-        //withSubscription(params.SUBSCRIPTION) {
-        //    withTeamSecrets(config, params.ENVIRONMENT) {
-
-                setVaultName('am-lib-test')
-                loadVaultSecrets(secrets)
-
+        withSubscription(params.SUBSCRIPTION) {
+            withTeamSecrets(config, params.ENVIRONMENT) {
                 docker.image('jbergknoff/postgresql-client').inside("--entrypoint='' -e PGPASSWORD=${DATABASE_PASS} -v ${WORKSPACE}:/migration") {
                     sh """
                         chmod 777 /migration/ccd-to-am-migration-runner.sh
@@ -73,7 +65,7 @@ node {
                         rm -rf /migration
                     """
                 }
-        //    }
-        //}
+            }
+        }
     }
 }

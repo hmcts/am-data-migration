@@ -2,6 +2,8 @@
 
 @Library('Infrastructure') _
 
+import uk.gov.hmcts.contino.AppPipelineConfig
+
 properties([
     parameters([
         choice(name: 'ENVIRONMENT', choices: 'saat\nsprod\naat\nprod', description: 'Environment where migration should be run'),

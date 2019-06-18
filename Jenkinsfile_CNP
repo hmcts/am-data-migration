@@ -16,6 +16,8 @@ def credentialsId = 'am-lib-test-aat'
 def secretId = 'am-lib-test-aat'
 def secrets = [
     (secretId): [
+        secret('am-lib-test-STORAGE-ACCOUNT-NAME', 'STORAGE_NAME'),
+        secret('am-lib-test-STORAGE-ACCOUNT-KEY', 'STORAGE_KEY'),
         secret('am-lib-test-POSTGRES-HOST', 'DATABASE_HOST'),
         secret('am-lib-test-POSTGRES-PORT', 'DATABASE_PORT'),
         secret('am-lib-test-POSTGRES-DATABASE', 'DATABASE_NAME'),
@@ -48,17 +50,19 @@ node {
 
         // download migration data from azure blob storage
         withDocker('hmcts/moj-azcopy-image:7.2.0-netcore-1.0', '-u root') {
-            withCredentials([usernamePassword(credentialsId: "${credentialsId}", passwordVariable: 'am-lib-test-STORAGE-ACCOUNT-KEY', usernameVariable: 'am-lib-test-STORAGE-ACCOUNT-NAME')]) {
+            //withCredentials([usernamePassword(credentialsId: "${credentialsId}", passwordVariable: 'am-lib-test-STORAGE-ACCOUNT-KEY', usernameVariable: 'am-lib-test-STORAGE-ACCOUNT-NAME')]) {
+            withTeamSecrets(config, params.ENVIRONMENT) {
                 sh "azcopy \
-                    --source https://${am-lib-test-STORAGE-ACCOUNT-NAME}.blob.core.windows.net/${source} \
-                    --source-key ${am-lib-test-STORAGE-ACCOUNT-KEY} \
+                    --source https://${STORAGE_NAME}.blob.core.windows.net/${source} \
+                    --source-key ${STORAGE_KEY} \
                     --destination ${destination}"
             }
         }
 
         // run migration scripts in postgres container
         withDocker('jbergknoff/postgresql-client', "--entrypoint='' -e PGPASSWORD=${DATABASE_PASS} -v ${WORKSPACE}:/migration") {
-            withCredentials([usernamePassword(credentialsId: "${credentialsId}", passwordVariable: 'DATABASE_PASS', usernameVariable: 'DATABASE_USER')]) {
+            //withCredentials([usernamePassword(credentialsId: "${credentialsId}", passwordVariable: 'DATABASE_PASS', usernameVariable: 'DATABASE_USER')]) {
+            withTeamSecrets(config, params.ENVIRONMENT) {
                 sh """
                     chmod 777 /migration/ccd-to-am-migration-runner.sh
                     /migration/ccd-to-am-migration-runner.sh ${DATABASE_HOST} ${DATABASE_PORT} ${DATABASE_NAME} ${DATABASE_USER} ccd-to-am-migration-main.sql

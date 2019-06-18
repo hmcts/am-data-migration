@@ -7,12 +7,13 @@ import uk.gov.hmcts.contino.AppPipelineConfig
 properties([
     pipelineTriggers([cron('H 05 * * *')]),
     parameters([
-        choice(name: 'ENVIRONMENT', choices: 'saat\nsprod\naat\nprod', description: 'Environment where migration should be run'),
-        choice(name: 'SUBSCRIPTION', choices: 'sandbox\nnonprod\nprod', description: 'Azure subscriptions available to build in')
+        choice(name: 'ENVIRONMENT', choices: 'aat\nsaat\nprod\nsprod', description: 'Environment where migration should be run'),
+        choice(name: 'SUBSCRIPTION', choices: 'nonprod\nprod\nsandbox', description: 'Azure subscriptions available to build in')
     ])
 ])
 
-def secretId = "am-lib-test-aat"
+def credentialsId = 'am-lib-test-aat'
+def secretId = 'am-lib-test-aat'
 def secrets = [
     (secretId): [
         secret('am-lib-test-POSTGRES-HOST', 'DATABASE_HOST'),
@@ -38,33 +39,31 @@ node {
         checkout scm
     }
 
-    if (params.ENVIRONMENT == 'saat') {
-        env.DB_HOST = 'localhost'
-        env.DB_PORT = '5432'
-        env.DB_NAME = 'am'
-        env.DB_USER = 'amuser'
-        env.DB_PASS = ''
-    } else {
-        env.DB_HOST = 'localhost'
-        env.DB_PORT = '5432'
-        env.DB_NAME = 'am'
-        env.DB_USER = 'amuser'
-        env.DB_PASS = ''
-    }
-
     stage('Run migration') {
         def config = new AppPipelineConfig()
         config.vaultSecrets = secrets
 
-        withSubscription(params.SUBSCRIPTION) {
-            withTeamSecrets(config, params.ENVIRONMENT) {
-                docker.image('jbergknoff/postgresql-client').inside("--entrypoint='' -e PGPASSWORD=${DATABASE_PASS} -v ${WORKSPACE}:/migration") {
-                    sh """
-                        chmod 777 /migration/ccd-to-am-migration-runner.sh
-                        /migration/ccd-to-am-migration-runner.sh ${DATABASE_HOST} ${DATABASE_PORT} ${DATABASE_NAME} ${DATABASE_USER} ccd-to-am-migration-main.sql
-                        rm -rf /migration
-                    """
-                }
+        def source = 'data/am-migration.csv'
+        def destination = '.'
+
+        // download migration data from azure blob storage
+        withDocker('hmcts/moj-azcopy-image:7.2.0-netcore-1.0', '-u root') {
+            withCredentials([usernamePassword(credentialsId: "${credentialsId}", passwordVariable: 'am-lib-test-STORAGE-ACCOUNT-KEY', usernameVariable: 'am-lib-test-STORAGE-ACCOUNT-NAME')]) {
+                sh "azcopy \
+                    --source https://${am-lib-test-STORAGE-ACCOUNT-NAME}.blob.core.windows.net/${source} \
+                    --source-key ${am-lib-test-STORAGE-ACCOUNT-KEY} \
+                    --destination ${destination}"
+            }
+        }
+
+        // run migration scripts in postgres container
+        withDocker('jbergknoff/postgresql-client', "--entrypoint='' -e PGPASSWORD=${DATABASE_PASS} -v ${WORKSPACE}:/migration") {
+            withCredentials([usernamePassword(credentialsId: "${credentialsId}", passwordVariable: 'DATABASE_PASS', usernameVariable: 'DATABASE_USER')]) {
+                sh """
+                    chmod 777 /migration/ccd-to-am-migration-runner.sh
+                    /migration/ccd-to-am-migration-runner.sh ${DATABASE_HOST} ${DATABASE_PORT} ${DATABASE_NAME} ${DATABASE_USER} ccd-to-am-migration-main.sql
+                    rm -rf /migration
+                """
             }
         }
     }

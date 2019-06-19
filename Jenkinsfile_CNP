@@ -9,7 +9,8 @@ properties([
     parameters([
         //choice(name: 'ENVIRONMENT', choices: 'aat\nsaat\nprod\nsprod', description: 'Environment where migration should be run'),
         //choice(name: 'SUBSCRIPTION', choices: 'nonprod\nprod\nsandbox', description: 'Azure subscriptions available to build in')
-        string(name: 'ENVIRONMENT', defaultValue: 'aat', description: 'Environment where migration should be run')
+        string(name: 'ENVIRONMENT', defaultValue: 'aat', description: 'Environment where migration should be run'),
+        string(name: 'SUBSCRIPTION', defaultValue: 'nonprod', description: 'Azure subscription available to build in')
     ])
 ])
 
@@ -37,38 +38,43 @@ static Map<String, Object> secret(String secretName, String envVar) {
 }
 
 node {
+
+    def config = new AppPipelineConfig()
+    config.vaultSecrets = secrets
+
     stage('Checkout') {
         deleteDir()
         checkout scm
     }
 
-    stage('Run migration') {
-        def config = new AppPipelineConfig()
-        config.vaultSecrets = secrets
-
+    // download migration data from azure blob storage
+    stage('Download migration data') {
         def source = 'data/am-migration.csv'
         def destination = '.'
 
-        // download migration data from azure blob storage
-        withDocker('hmcts/moj-azcopy-image:7.2.0-netcore-1.0', '-u root') {
-            //withCredentials([usernamePassword(credentialsId: "${credentialsId}", passwordVariable: 'am-lib-test-STORAGE-ACCOUNT-KEY', usernameVariable: 'am-lib-test-STORAGE-ACCOUNT-NAME')]) {
+        withSubscription(params.SUBSCRIPTION) {
             withTeamSecrets(config, params.ENVIRONMENT) {
-                sh "azcopy \
-                    --source https://${STORAGE_NAME}.blob.core.windows.net/${source} \
-                    --source-key ${STORAGE_KEY} \
-                    --destination ${destination}"
+                withDocker('hmcts/moj-azcopy-image:7.2.0-netcore-1.0', '-u root') {
+                    sh "azcopy \
+                        --source https://${STORAGE_NAME}.blob.core.windows.net/${source} \
+                        --source-key ${STORAGE_KEY} \
+                        --destination ${destination}"
+                }
             }
         }
+    }
 
-        // run migration scripts in postgres container
-        withDocker('jbergknoff/postgresql-client', "--entrypoint='' -e PGPASSWORD=${DATABASE_PASS} -v ${WORKSPACE}:/migration") {
-            //withCredentials([usernamePassword(credentialsId: "${credentialsId}", passwordVariable: 'DATABASE_PASS', usernameVariable: 'DATABASE_USER')]) {
+    // run migration scripts in postgres container
+    stage('Run migration') {
+        withSubscription(params.SUBSCRIPTION) {
             withTeamSecrets(config, params.ENVIRONMENT) {
-                sh """
-                    chmod 777 /migration/ccd-to-am-migration-runner.sh
-                    /migration/ccd-to-am-migration-runner.sh ${DATABASE_HOST} ${DATABASE_PORT} ${DATABASE_NAME} ${DATABASE_USER} ccd-to-am-migration-main.sql
-                    rm -rf /migration
-                """
+                withDocker('jbergknoff/postgresql-client', "--entrypoint='' -e PGPASSWORD=${DATABASE_PASS} -v ${WORKSPACE}:/migration") {
+                    sh """
+                        chmod 777 /migration/ccd-to-am-migration-runner.sh
+                        /migration/ccd-to-am-migration-runner.sh ${DATABASE_HOST} ${DATABASE_PORT} ${DATABASE_NAME} ${DATABASE_USER} ccd-to-am-migration-main.sql
+                        rm -rf /migration
+                    """
+                }
             }
         }
     }

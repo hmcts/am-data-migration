@@ -72,10 +72,13 @@ node {
                     sh """
                         chmod 777 /migration/ccd-to-am-migration-runner.sh
                         /migration/ccd-to-am-migration-runner.sh ${DATABASE_HOST} ${DATABASE_PORT} ${DATABASE_NAME} ${DATABASE_USER} ccd-to-am-migration-main.sql
-                        sudo rm -rf /migration
                     """
                 }
             }
         }
+    }
+
+    stage('Clean up') {
+        deleteDir()
     }
 }

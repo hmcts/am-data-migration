@@ -58,7 +58,7 @@ node {
                     sh "azcopy \
                         --source https://${STORAGE_NAME}.blob.core.windows.net/${source} \
                         --source-key ${STORAGE_KEY} \
-                        --destination ${destination}"
+                        --destination ${destination}/am-migration.csv"
                 }
             }
         }

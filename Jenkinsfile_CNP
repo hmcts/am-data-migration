@@ -50,7 +50,7 @@ node {
     // download migration data from azure blob storage
     stage('Download migration data') {
         def source = 'data/am-migration.csv'
-        def destination = '.'
+        def destination = "${WORKSPACE}"
 
         withSubscription(params.SUBSCRIPTION) {
             withTeamSecrets(config, params.ENVIRONMENT) {

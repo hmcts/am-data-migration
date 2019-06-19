@@ -4,7 +4,7 @@ echo
 set -e
 set -u
 
-echo "* CCD to AM migration..."
+echo "* Starting AM migration..."
 echo
 
 if [ "$#" -ne 5 ]; then

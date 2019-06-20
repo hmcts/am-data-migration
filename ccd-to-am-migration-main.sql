@@ -68,4 +68,6 @@ SELECT COUNT(*) AS "migration errors" FROM errors;
 
 SELECT * FROM errors;
 
+SELECT MAX(access_management_id) AS "max access_management_id" FROM access_management;
+
 COMMIT;

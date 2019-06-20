@@ -5,7 +5,6 @@
 import uk.gov.hmcts.contino.AppPipelineConfig
 
 properties([
-    pipelineTriggers([cron('H 05 * * *')]),
     parameters([
         string(name: 'ENVIRONMENT', defaultValue: 'aat', description: 'Environment where migration should be run'),
         string(name: 'SUBSCRIPTION', defaultValue: 'nonprod', description: 'Azure subscription available to build in'),

@@ -27,7 +27,7 @@ The pipeline will take the migration scripts from the `scripts` directory in thi
 
 ## Running the data migration
 
-The migration can be triggered through the (Jenkins dashboard interface)[https://build.platform.hmcts.net/job/HMCTS_AM/job/am-data-migration/]. Navigate to the `master` branch and select `Build with Parameters`.
+The migration can be triggered through the [Jenkins dashboard interface](https://build.platform.hmcts.net/job/HMCTS_AM/job/am-data-migration/). Navigate to the `master` branch and select `Build with Parameters`.
 
 The following build parameters can be set:
  - `ENVIRONMENT`: the target environment for the migration (eg. `aat`, `prod`)
@@ -39,4 +39,4 @@ Once these parameters have been entered, press `Build` and the data migration wi
 
 ## More information
 
-More information about the design of the Access Management Migration Service can be found here: (https://tools.hmcts.net/confluence/display/AM/Initial+Data+Migration)[https://tools.hmcts.net/confluence/display/AM/Initial+Data+Migration]
+More information about the design of the Access Management Migration Service can be found here: https://tools.hmcts.net/confluence/display/AM/Initial+Data+Migration

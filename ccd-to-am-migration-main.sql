@@ -26,7 +26,7 @@ SELECT COUNT(*) AS "rows to migrate" FROM stage;
 
 SELECT COUNT(*) AS "pre-migration access_management count" FROM access_management;
 
-INSERT INTO access_management_migration_errors (
+WITH migration_errors AS (
     DELETE FROM stage
     WHERE case_data_id IS NULL
         OR case_type_id IS NULL
@@ -35,7 +35,8 @@ INSERT INTO access_management_migration_errors (
         OR case_type_id NOT IN (SELECT resource_name FROM resources)
         OR case_role NOT IN (SELECT role_name FROM roles)
     RETURNING *
-);
+)
+INSERT INTO access_management_migration_errors SELECT * FROM migration_errors;
 
 INSERT INTO access_management (resource_id, accessor_type, accessor_id,
         "attribute", permissions, service_name, resource_name,

@@ -15,7 +15,7 @@ The pipeline will download the migration data file from the following location i
  - Storage account: `ammigrationdata`
  - Container: `data`
 
-Upload the migration data file to this location using the [Azure dashboard interface](https://portal.azure.com/#blade/HubsExtension/BrowseResourceBlade/resourceType/Microsoft.Storage%2FStorageAccounts). Note that the migration data file MUST be in CSV format.
+Upload the migration data file to this location using the [Azure dashboard](https://portal.azure.com/#blade/HubsExtension/BrowseResourceBlade/resourceType/Microsoft.Storage%2FStorageAccounts). Note that the migration data file MUST be in CSV format.
 
 The naming convention for the uploaded file should be as follows:
  - `am-migration-{DDMMYY}.csv`
@@ -27,7 +27,7 @@ The pipeline will take the migration scripts from the `scripts` directory in thi
 
 ## Running the data migration
 
-The migration can be triggered through the [Jenkins dashboard interface](https://build.platform.hmcts.net/job/HMCTS_AM/job/am-data-migration/). Navigate to the `master` branch and select `Build with Parameters`.
+The migration can be triggered through the [Jenkins dashboard](https://build.platform.hmcts.net/job/HMCTS_AM/job/am-data-migration/). Navigate to the `master` branch and select `Build with Parameters`.
 
 The following build parameters can be set:
  - `ENVIRONMENT`: the target environment for the migration (eg. `aat`, `prod`)

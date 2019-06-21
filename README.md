@@ -1,8 +1,8 @@
-# Access Management Migration Service
+# Access Management Data Migration Service
 
 ## Purpose
 
-The Access Management Migration Service provides a Jenkins pipeline for automated data migration to the Access Management database.
+The Access Management Data Migration Service provides a Jenkins pipeline for automated data migration to the Access Management database.
 
 The pipeline:
  - reads the migration data file from Azure Blob Storage
@@ -39,4 +39,4 @@ Once these parameters have been entered, press `Build` and the data migration wi
 
 ## More information
 
-More information about the design of the Access Management Migration Service can be found here: https://tools.hmcts.net/confluence/display/AM/Initial+Data+Migration
+More information about the design of the Access Management Data Migration Service can be found here: https://tools.hmcts.net/confluence/display/AM/Initial+Data+Migration

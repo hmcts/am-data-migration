@@ -20,7 +20,7 @@ HOST="$1"
 PORT="$2"
 DB="$3"
 USER="$4"
-SQL="$5"
+SQL="scripts/$5"
 
 echo "* AM DB hostname: $HOST"
 echo "* AM DB port: $PORT"

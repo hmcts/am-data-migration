@@ -1,16 +1,19 @@
 
 BEGIN;
 
-CREATE TEMP TABLE stage
-(
-    case_data_id VARCHAR, case_type_id VARCHAR,
-    user_id VARCHAR, case_role VARCHAR
+DROP TABLE IF EXISTS access_management_migration_errors;
+CREATE TABLE access_management_migration_errors (
+    case_data_id VARCHAR,
+    case_type_id VARCHAR,
+    user_id VARCHAR,
+    case_role VARCHAR
 );
 
-CREATE TEMP TABLE errors
-(
-    case_data_id VARCHAR, case_type_id VARCHAR,
-    user_id VARCHAR, case_role VARCHAR
+CREATE TEMP TABLE stage (
+    case_data_id VARCHAR,
+    case_type_id VARCHAR,
+    user_id VARCHAR,
+    case_role VARCHAR
 );
 
 ALTER TABLE access_management DROP CONSTRAINT access_management_unique;
@@ -23,7 +26,7 @@ SELECT COUNT(*) AS "rows to migrate" FROM stage;
 
 SELECT COUNT(*) AS "pre-migration access_management count" FROM access_management;
 
-WITH found_errors AS (
+INSERT INTO access_management_migration_errors (
     DELETE FROM stage
     WHERE case_data_id IS NULL
         OR case_type_id IS NULL
@@ -32,8 +35,7 @@ WITH found_errors AS (
         OR case_type_id NOT IN (SELECT resource_name FROM resources)
         OR case_role NOT IN (SELECT role_name FROM roles)
     RETURNING *
-)
-INSERT INTO errors SELECT * FROM found_errors;
+);
 
 INSERT INTO access_management (resource_id, accessor_type, accessor_id,
         "attribute", permissions, service_name, resource_name,
@@ -64,10 +66,6 @@ COMMIT;
 
 SELECT COUNT(*) AS "post-migration access_management count" FROM access_management;
 
-SELECT COUNT(*) AS "migration errors" FROM errors;
-
-SELECT * FROM errors;
-
-SELECT MAX(access_management_id) AS "max access_management_id" FROM access_management;
+SELECT COUNT(*) AS "migration errors" FROM access_management_migration_errors;
 
 COMMIT;

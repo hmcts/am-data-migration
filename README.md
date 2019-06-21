@@ -15,7 +15,7 @@ The pipeline will download the migration data file from the following location i
  - Storage account: `ammigrationdata`
  - Container: `data`
 
-Upload the migration data file to this location using the Azure dashboard interface. Note that the migration data file MUST be in CSV format.
+Upload the migration data file to this location using the [Azure dashboard interface](https://portal.azure.com/#blade/HubsExtension/BrowseResourceBlade/resourceType/Microsoft.Storage%2FStorageAccounts). Note that the migration data file MUST be in CSV format.
 
 The naming convention for the uploaded file should be as follows:
  - `am-migration-{DDMMYY}.csv`

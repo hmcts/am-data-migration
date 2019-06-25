@@ -39,9 +39,7 @@ node {
     def config = new AppPipelineConfig()
     config.vaultSecrets = secrets
 
-    def azure = {
-        "${params.ENVIRONMENT}" == 'prod' ? 'prod' : 'nonprod'
-    }
+    def subscription = ("${params.ENVIRONMENT}".equals('prod')) ? 'prod' : 'nonprod'
 
     stage('Checkout') {
         deleteDir()
@@ -53,7 +51,7 @@ node {
         def source = "data/${params.MIGRATION_DATA_FILENAME}"
         def destination = "${WORKSPACE}/am-migration.csv"
 
-        withSubscription(azure) {
+        withSubscription(subscription) {
             withTeamSecrets(config, params.ENVIRONMENT) {
                 withDocker('hmcts/moj-azcopy-image:7.2.0-netcore-1.0', '-u root') {
                     sh "azcopy \
@@ -67,7 +65,7 @@ node {
 
     // run migration scripts in postgres container
     stage('Run migration scripts') {
-        withSubscription(azure) {
+        withSubscription(subscription) {
             withTeamSecrets(config, params.ENVIRONMENT) {
                 withDocker('jbergknoff/postgresql-client', "--entrypoint='' -e PGPASSWORD=${DATABASE_PASS} -v ${WORKSPACE}:/migration") {
                     sh "chmod +x /migration/am-migration-runner.sh"

@@ -12,7 +12,6 @@ properties([
     ])
 ])
 
-def subscription =
 def secretId = "am-lib-test-${params.ENVIRONMENT}"
 def secrets = [
     (secretId): [

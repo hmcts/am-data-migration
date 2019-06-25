@@ -81,7 +81,7 @@ node {
     }
 
     stage ('Publish metrics') {
-        sh 'echo "Publishing migration metrics to Jenkins build artifacts: am-migration.metrics"'
+        echo 'Publishing migration metrics to Jenkins build artifacts: am-migration.metrics'
         archiveArtifacts allowEmptyArchive: true, artifacts: 'am-migration.metrics'
     }
 

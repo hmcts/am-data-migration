@@ -85,7 +85,7 @@ node {
     }
 
     stage ('Publish metrics') {
-        archiveArtifacts allowEmptyArchive: true, artifacts: "${WORKSPACE}/metrics.log"
+        archiveArtifacts allowEmptyArchive: true, artifacts: 'metrics.log'
     }
 
     stage('Clean up') {

@@ -81,7 +81,11 @@ node {
     }
 
     stage ('Print file') {
-        sh "cat ${WORKSPACE}/output.o" 
+        sh "cat ${WORKSPACE}/metrics.log"
+    }
+
+    stage ('Publish metrics') {
+        archiveArtifacts allowEmptyArchive: true, artifacts: "${WORKSPACE}/metrics.log"
     }
 
     stage('Clean up') {

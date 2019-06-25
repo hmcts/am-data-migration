@@ -40,7 +40,7 @@ METRICS=$(psql \
     --set ON_ERROR_STOP=off \
     $DB)
 
-echo "$METRICS" > output.o
+echo "$METRICS" > metrics.log
 
 echo "* Migration finished"
 echo

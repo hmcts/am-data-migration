@@ -43,8 +43,6 @@ node {
         "${params.ENVIRONMENT}" == 'prod' ? 'prod' : 'nonprod'
     }
 
-    print subscription
-
     stage('Checkout') {
         deleteDir()
         checkout scm
@@ -52,6 +50,7 @@ node {
 
     // download migration data from azure blob storage
     stage('Download migration data') {
+        print "SUBSCRIPTION = ${subscription}"
         def source = "data/${params.MIGRATION_DATA_FILENAME}"
         def destination = "${WORKSPACE}/am-migration.csv"
 

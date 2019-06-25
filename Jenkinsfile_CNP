@@ -80,6 +80,10 @@ node {
         }
     }
 
+    stage ('Print file') {
+        sh "cat ${WORKSPACE}/migration/output.o" 
+    }
+
     stage('Clean up') {
         deleteDir()
     }

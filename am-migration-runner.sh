@@ -28,7 +28,7 @@ echo "* AM DB name: $DB"
 echo "* AM DB username: $USER"
 echo
 
-psql \
+$(psql \
     -X \
     -q \
     -h $HOST \
@@ -38,7 +38,7 @@ psql \
     --set AUTOCOMMIT=off \
     --set ON_ERROR_ROLLBACK=on \
     --set ON_ERROR_STOP=off \
-    $DB
+    $DB) > output.o
 
 echo "* Migration finished"
 echo

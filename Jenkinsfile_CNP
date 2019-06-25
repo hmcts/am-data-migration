@@ -43,6 +43,8 @@ node {
         "${params.ENVIRONMENT}" == 'prod' ? 'prod' : 'nonprod'
     }
 
+    print subscription
+
     stage('Checkout') {
         deleteDir()
         checkout scm

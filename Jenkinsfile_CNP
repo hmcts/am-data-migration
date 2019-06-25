@@ -80,12 +80,9 @@ node {
         }
     }
 
-    stage ('Print file') {
-        sh "cat ${WORKSPACE}/metrics.log"
-    }
-
     stage ('Publish metrics') {
-        archiveArtifacts allowEmptyArchive: true, artifacts: 'metrics.log'
+        sh 'echo "Publishing migration metrics to Jenkins build artifacts: am-migration.metrics"'
+        archiveArtifacts allowEmptyArchive: true, artifacts: 'am-migration.metrics'
     }
 
     stage('Clean up') {

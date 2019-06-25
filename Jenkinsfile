@@ -6,13 +6,13 @@ import uk.gov.hmcts.contino.AppPipelineConfig
 
 properties([
     parameters([
-        string(name: 'ENVIRONMENT', defaultValue: 'aat', description: 'Environment where migration should be run'),
-        string(name: 'SUBSCRIPTION', defaultValue: 'nonprod', description: 'Azure subscription available to build in'),
-        string(name: 'MIGRATION_DATA_FILENAME', defaultValue: 'am-migration-short.csv', description: 'Name of migration data file in Azure Blob Store'),
-        string(name: 'MIGRATION_SCRIPT_FILENAME', defaultValue: 'ccd-to-am-migration-main.sql', description: 'Name of migration script to execute')
+        choice(name: 'ENVIRONMENT', choices: 'aat\nprod', description: 'Environment where migration should be run'),
+        string(name: 'MIGRATION_DATA_FILENAME', defaultValue: 'am-migration.csv', description: 'Name of migration data file in Azure Blob Store'),
+        string(name: 'MIGRATION_SCRIPT_FILENAME', defaultValue: 'am-migration-init.sql', description: 'Name of migration script to execute')
     ])
 ])
 
+def subscription =
 def secretId = "am-lib-test-${params.ENVIRONMENT}"
 def secrets = [
     (secretId): [
@@ -40,6 +40,10 @@ node {
     def config = new AppPipelineConfig()
     config.vaultSecrets = secrets
 
+    def subscription = {
+        "${params.ENVIRONMENT}" == 'prod' ? 'prod' : 'nonprod'
+    }
+
     stage('Checkout') {
         deleteDir()
         checkout scm
@@ -50,7 +54,7 @@ node {
         def source = "data/${params.MIGRATION_DATA_FILENAME}"
         def destination = "${WORKSPACE}/am-migration.csv"
 
-        withSubscription(params.SUBSCRIPTION) {
+        withSubscription(subscription) {
             withTeamSecrets(config, params.ENVIRONMENT) {
                 withDocker('hmcts/moj-azcopy-image:7.2.0-netcore-1.0', '-u root') {
                     sh "azcopy \

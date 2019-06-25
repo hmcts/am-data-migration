@@ -81,7 +81,7 @@ node {
     }
 
     stage ('Print file') {
-        sh "cat ${WORKSPACE}/migration/output.o" 
+        sh "cat ${WORKSPACE}/output.o" 
     }
 
     stage('Clean up') {

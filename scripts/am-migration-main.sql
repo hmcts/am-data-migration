@@ -69,4 +69,6 @@ SELECT COUNT(*) AS "post-migration access_management count" FROM access_manageme
 
 SELECT COUNT(*) AS "migration errors" FROM access_management_migration_errors;
 
+SELECT * FROM access_management_migration_errors LIMIT 100;
+
 COMMIT;

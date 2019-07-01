@@ -36,18 +36,6 @@ WITH ins_resources AS
 )
 SELECT COUNT(*) AS "resources inserts" FROM ins_resources;
 
-WITH ins_resource_attributes AS
-(
-    INSERT INTO resource_attributes
-        SELECT service_name, resource_type, resource_name, '' AS "attribute",
-            'PUBLIC' as default_security_classification
-        FROM resources
-    EXCEPT
-        SELECT * FROM resource_attributes
-    RETURNING resource_name
-)
-SELECT COUNT(*) AS "resource_attributes inserts" FROM ins_resource_attributes;
-
 WITH ins_roles AS
 (
     INSERT INTO roles
@@ -60,18 +48,5 @@ WITH ins_roles AS
     RETURNING role_name
 )
 SELECT COUNT(*) AS "roles inserts" FROM ins_roles;
-
-WITH ins_default_permissions_for_roles AS
-(
-    INSERT INTO default_permissions_for_roles
-        SELECT re.service_name AS service_name, re.resource_type AS resource_type,
-            re.resource_name AS resource_name, '' AS "attribute",
-            ro.role_name AS role_name, '2' AS permissions
-        FROM resources AS re, roles AS ro
-    EXCEPT
-        SELECT * FROM default_permissions_for_roles
-    RETURNING resource_name
-)
-SELECT COUNT(*) AS "default_permissions_for_roles inserts" FROM ins_default_permissions_for_roles;
 
 COMMIT;

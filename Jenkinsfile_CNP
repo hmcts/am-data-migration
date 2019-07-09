@@ -7,8 +7,8 @@ import uk.gov.hmcts.contino.AppPipelineConfig
 properties([
     parameters([
         choice(name: 'ENVIRONMENT', choices: 'aat\nprod', description: 'Environment where migration should be run'),
-        string(name: 'MIGRATION_DATA_FILENAME', defaultValue: 'am-migration.csv', description: 'Name of migration data file in Azure Blob Store'),
-        string(name: 'MIGRATION_SCRIPT_FILENAME', defaultValue: 'am-migration-init.sql', description: 'Name of migration script to execute')
+        string(name: 'MIGRATION_DATA_FILENAME', defaultValue: 'ccd-am-migration.csv', description: 'Name of migration data file in Azure Blob Store'),
+        string(name: 'MIGRATION_SCRIPT_FILENAME', defaultValue: 'ccd-am-migration-init.sql', description: 'Name of migration script to execute')
     ])
 ])
 

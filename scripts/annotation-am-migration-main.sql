@@ -49,7 +49,7 @@ WITH file_duplicates AS (
         AND a.resource_name = b.resource_name
     RETURNING *
 )
-SELECT COUNT(*) AS "duplicate rows in file (removing from migration)" FROM file_duplicates;
+SELECT COUNT(*) AS "duplicate rows in file (skipping)" FROM file_duplicates;
 
 WITH access_management_duplicates AS (
     DELETE FROM stage a USING access_management b
@@ -61,7 +61,7 @@ WITH access_management_duplicates AS (
         AND a.resource_name = b.resource_name
     RETURNING *
 )
-SELECT COUNT(*) AS "duplicate rows in access_management table (removing from migration)" FROM access_management_duplicates;
+SELECT COUNT(*) AS "duplicate rows in access_management table (skipping)" FROM access_management_duplicates;
 
 SELECT COUNT(*) AS "pre-migration access_management count" FROM access_management;
 

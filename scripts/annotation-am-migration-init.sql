@@ -13,6 +13,16 @@ ON COMMIT DROP;
 
 \COPY stage FROM 'am-migration.csv' DELIMITER ',' CSV HEADER;
 
+WITH ins_services AS (
+    INSERT INTO services
+        SELECT 'Annotations' AS service_name, 'Service for annotations'
+            AS service_description
+    EXCEPT
+        SELECT * FROM services
+    RETURNING service_name
+)
+SELECT COUNT(*) AS "services inserts" FROM ins_services;
+
 WITH ins_resources AS (
     INSERT INTO resources
         SELECT 'Annotations' AS service_name, 'ANNOTATION' AS resource_type,

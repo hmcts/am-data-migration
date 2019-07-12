@@ -59,6 +59,7 @@ WITH access_management_duplicates AS (
         AND a.annotation_id = b."attribute"
         AND a.permissions_int = b.permissions
         AND a.resource_name = b.resource_name
+        AND b.resource_type = 'ANNOTATION'
     RETURNING *
 )
 SELECT COUNT(*) AS "duplicate rows in access_management table (skipping)" FROM access_management_duplicates;

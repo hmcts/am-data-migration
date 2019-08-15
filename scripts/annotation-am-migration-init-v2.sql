@@ -16,7 +16,7 @@ ON COMMIT DROP;
 
 \COPY stage FROM 'am-migration.csv' DELIMITER ',' CSV HEADER;
 
-/*WITH ins_services AS (
+WITH ins_services AS (
     INSERT INTO services
         SELECT service_name, 'Service for annotations' AS service_description
         FROM stage
@@ -24,7 +24,7 @@ ON COMMIT DROP;
         SELECT * FROM services
     RETURNING service_name
 )
-SELECT COUNT(*) AS "services inserts" FROM ins_services;*/
+SELECT COUNT(*) AS "services inserts" FROM ins_services;
 
 WITH ins_resources AS (
     INSERT INTO resources

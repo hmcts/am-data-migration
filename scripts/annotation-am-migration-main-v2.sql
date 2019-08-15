@@ -45,7 +45,7 @@ WITH file_duplicates AS (
         AND a.service_name = b.service_name
         AND a.resource_name = b.resource_name
         AND a.resource_type = b.resource_type
-        AND a.relationship = b.relationship
+        AND (a.relationship = b.relationship OR (a.relationship IS NULL AND b.relationship IS NULL))
     RETURNING *
 )
 SELECT COUNT(*) AS "duplicate rows in file (skipping)" FROM file_duplicates;
@@ -80,7 +80,7 @@ WITH migration_errors AS (
         OR NOT EXISTS (SELECT service_name, resource_name, resource_type FROM resources AS r
             WHERE stage.service_name = r.service_name AND stage.resource_name = r.resource_name AND
             stage.resource_type = r.resource_type)
-        OR relationship NOT IN (SELECT role_name FROM roles)
+        OR (relationship IS NOT NULL AND relationship NOT IN (SELECT role_name FROM roles))
     RETURNING resource_id, accessor_type, accessor_id, "attribute", permissions, service_name, resource_name,
         resource_type, relationship
 )

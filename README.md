@@ -31,11 +31,23 @@ The migration can be triggered through the [Jenkins dashboard](https://build.pla
 
 The following build parameters can be set:
  - `ENVIRONMENT`: the target environment for the migration (eg. `aat`, `prod`)
- - `SUBSCRIPTION`: the Azure subscription for accessing Azure Key Vault and Azure Storage Accounts
  - `MIGRATION_DATA_FILENAME`: the name of the migration data file in Azure Storage Accounts
  - `MIGRATION_SCRIPT_FILENAME`: the name of the migration script in the `scripts` directory
 
 Once these parameters have been entered, press `Build` and the data migration will be carried out.
+
+## Metrics
+
+The pipeline produces a metrics file which gives the following information:
+ - the number of records read from the input file
+ - the number of duplicate records in the input file (which are then excluded from the migration)
+ - the number of records in the input file that already exist in the access_management table (which are then excluded from the migration)
+ - the number of records in the access_management table pre-migration
+ - the number of records in the access_management table post-migration, allowing you to calculate the number of records migrated
+ - the number of erroneous records in the input file that were not migrated
+ - the erroneous records that were not migrated (limited to 100 records)
+
+This metrics file can be found through the [Jenkins dashboard](https://build.platform.hmcts.net/job/HMCTS_AM/job/am-data-migration/) once the migration has been completed.
 
 ## More information
 

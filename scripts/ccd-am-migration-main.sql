@@ -24,6 +24,27 @@ ALTER TABLE access_management DROP CONSTRAINT relationship_fkey;
 
 SELECT COUNT(*) AS "rows to migrate" FROM stage;
 
+WITH file_duplicates AS (
+    DELETE FROM stage a USING stage b
+    WHERE a.ctid < b.ctid
+        AND a.case_data_id = b.case_data_id
+        AND a.case_type_id = b.case_type_id
+        AND a.user_id = b.user_id
+        AND a.case_role = b.case_role
+    RETURNING *
+)
+SELECT COUNT(*) AS "duplicate rows in file (skipping)" FROM file_duplicates;
+
+WITH access_management_duplicates AS (
+    DELETE FROM stage a USING access_management b
+    WHERE a.case_data_id = b.resource_id
+        AND a.case_type_id = b.resource_name
+        AND a.user_id = b.accessor_id
+        AND a.case_role = b.relationship
+    RETURNING *
+)
+SELECT COUNT(*) AS "duplicate rows in access_management table (skipping)" FROM access_management_duplicates;
+
 SELECT COUNT(*) AS "pre-migration access_management count" FROM access_management;
 
 WITH migration_errors AS (

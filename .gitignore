@@ -1,3 +1,6 @@
 # do not add data file to repository
 *.csv
 data
+
+# intellij
+.idea/

@@ -16,15 +16,24 @@ ON COMMIT DROP;
 
 \COPY stage FROM 'am-migration.csv' DELIMITER ',' CSV HEADER;
 
-WITH ins_services AS (
-    INSERT INTO services
-        SELECT service_name, 'Service for annotations' AS service_description
-        FROM stage
-    EXCEPT
-        SELECT * FROM services
-    RETURNING service_name
-)
-SELECT COUNT(*) AS "services inserts" FROM ins_services;
+UPDATE stage
+SET resource_id = BTRIM(resource_id),
+    accessor_id = BTRIM(accessor_id),
+    attribute = BTRIM(attribute),
+    service_name = BTRIM(service_name),
+    resource_name = BTRIM(resource_name),
+    resource_type = BTRIM(resource_type),
+    relationship = BTRIM(relationship);
+
+-- WITH ins_services AS (
+--     INSERT INTO services
+--         SELECT service_name, 'Service for annotations' AS service_description
+--         FROM stage
+--     EXCEPT
+--         SELECT * FROM services
+--     RETURNING service_name
+-- )
+-- SELECT COUNT(*) AS "services inserts" FROM ins_services;
 
 WITH ins_resources AS (
     INSERT INTO resources

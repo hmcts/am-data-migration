@@ -25,15 +25,15 @@ SET resource_id = BTRIM(resource_id),
     resource_type = BTRIM(resource_type),
     relationship = BTRIM(relationship);
 
--- WITH ins_services AS (
---     INSERT INTO services
---         SELECT service_name, 'Service for annotations' AS service_description
---         FROM stage
---     EXCEPT
---         SELECT * FROM services
---     RETURNING service_name
--- )
--- SELECT COUNT(*) AS "services inserts" FROM ins_services;
+WITH ins_services AS (
+    INSERT INTO services
+        SELECT service_name, 'Service for annotations' AS service_description
+        FROM stage
+    EXCEPT
+        SELECT * FROM services
+    RETURNING service_name
+)
+SELECT COUNT(*) AS "services inserts" FROM ins_services;
 
 WITH ins_resources AS (
     INSERT INTO resources
